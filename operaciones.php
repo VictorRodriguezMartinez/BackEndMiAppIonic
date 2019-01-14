@@ -20,16 +20,20 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case 'it':
                 insertTrabajo();
                 break;
-        }
-        break;
-    case 'PUT'://update
-
-        echo 'Llamada hecha a traves de PUT';
-    case 'GET'://select
-        switch ($_REQUEST['operacion']) {
             case 'iu':
                 insertUsuario();
                 break;
+        }
+        break;
+    case 'PUT'://update
+    switch ($_REQUEST['operacion']) {
+        case 'mus':
+            insertDiaTrabajo();
+            break;
+    }
+        echo 'Llamada hecha a traves de PUT';
+    case 'GET'://select
+        switch ($_REQUEST['operacion']) {
             case 'lg':
                 isUsuario();
                 break;
@@ -52,12 +56,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
 function insertTrabajo()
 {
-    $response = array ();
+    $response = array();
 
     $conn = new mysqli('localhost', 'root', '', 'dambbdd');
 
     if ($conn->connect_error) {
-        die ("Connection failed: " . $conn->connect_error);
+        die("Connection failed: " . $conn->connect_error);
     }
 
     $nombre = $_REQUEST["nombre"];
@@ -68,15 +72,14 @@ function insertTrabajo()
 
     if ($conn->query($sql) === true) {
 
-        $trabajo[] = array ();
+        $trabajo[] = array();
         $trabajo['id'] = $conn->insert_id;
         $trabajo['nombre'] = $nombre;
         $trabajo['descripcion'] = $descripcion;
 
         $response["trabajo"] = $trabajo;
 
-    }
-    else {
+    } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
     $conn->close();
@@ -89,7 +92,7 @@ function insertTrabajo()
 function getTrabajosUsuario()
 {
 // echo($_REQUEST['trabajosAsignados']);
-    if ($_REQUEST['trabajosAsignados']=="true") {
+    if ($_REQUEST['trabajosAsignados'] == "true") {
         
         //si son los trabajos asignados a un usuario se debera pasar por parametro 
         //el id del usuario
@@ -161,25 +164,26 @@ function getTrabajosUsuario()
     }
 }
 
-function getTrabajos(){
-    $response = array ();
+function getTrabajos()
+{
+    $response = array();
 
     $conn = new mysqli('localhost', 'root', '', 'dambbdd');
 
     if ($conn->connect_error) {
-        die ("Connection failed: " . $conn->connect_error);
+        die("Connection failed: " . $conn->connect_error);
     }
 
     $sql;
-    if(isset($_REQUEST['idTrabajo'])) {
-        $sql = "select * from trabajo where id=".$_REQUEST['idTrabajo']." ;";
-    }else{
+    if (isset($_REQUEST['idTrabajo'])) {
+        $sql = "select * from trabajo where id=" . $_REQUEST['idTrabajo'] . " ;";
+    } else {
         $sql = "select * from trabajo ;";
     }
 
     $result = $conn->query($sql);
 
-    $trabajos = array ();
+    $trabajos = array();
     if ($result->num_rows > 0) {
         // array_push($response, "response", true);
         // $response['response']=true;
@@ -190,8 +194,7 @@ function getTrabajos(){
 
             $trabajos[] = $trabajo;
         }
-    }
-    else {
+    } else {
         $response['response'] = false;
     }
     $response['trabajos'] = $trabajos;
@@ -246,7 +249,7 @@ function insertDiaTrabajo()
     if ($jornadaContinua) {//JORNADA CONTINUA
 
         $sql = "insert into dia_trabajo (id, id_trabajo_usuario, hora_inicio_manana, hora_fin_manana, fecha, comentario) 
-            values                      (default," . $idTrabajoUsuario . ", '" . $horaInicioManana . ":00','" . $horaFinManana . ":00','" . $fecha . "', '" . $comentario . "' ) ;";
+            values                      (default," . $idTrabajoUsuario . ", '" . $horaInicioManana . ":00','" . $horaFinManana . ":00',CURRENT_TIMESTAMP(), '" . $comentario . "' ) ;";
         $result = $conn->query($sql);
         if ($result) {
             $response['response'] = true;
